@@ -12,7 +12,7 @@ class OvA:
     def __init__(self):
         self.W = None
 
-    def fit(self, data, times=1000, learning_rate=0.1):
+    def fit(self, data, times=1000, learning_rate=10**-10):
         self.W = None
 
         for c in data.target_names:
