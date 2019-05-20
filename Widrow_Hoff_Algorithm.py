@@ -12,16 +12,16 @@ class OvA:
     def __init__(self):
         self.W = None
 
-    def fit(self, data, times=1000, learning_rate=10**-10):
+    def fit(self, data, times=1000, learning_rate=10**-3):
         self.W = None
 
         for c in data.target_names:
             y = make_y(c)
-            model_c = WHALG(data, y, times, learning_rate)
+            w_c = WHALG(data, y, times, learning_rate)
             if self.W is None:
-                self.W = np.array(model_c).reshape(-1, 1)
+                self.W = np.array(w_c).reshape(-1, 1)
             else:
-                self.W = np.append(self.W, model_c, axis=1)
+                self.W = np.append(self.W, w_c, axis=1)
 
     def predict(self, X):
         Y = X@self.W
@@ -42,11 +42,9 @@ def WHALG(dataset, y_func, times, learning_rate):
         x = dataset.data[ind]
         y_hat = x.transpose()@w
         y = y_func(ind, dataset)
-        for w_j, x_j in zip(w, x):
-            w_j += learning_rate*(y - y_hat)*x_j
+        w += learning_rate*(y - y_hat)*x
 
     return w
-
 
 
 if __name__ == '__main__':
