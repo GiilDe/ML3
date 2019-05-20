@@ -48,6 +48,7 @@ def WHALG(dataset, y_func, times, learning_rate):
     return w
 
 
+
 if __name__ == '__main__':
     digits = load_digits()
     classifier = OvA()
