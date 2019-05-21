@@ -1,54 +1,72 @@
 import numpy as np
-from sklearn.datasets import load_digits
+from sklearn.datasets import load_digits, load_iris, load_breast_cancer
+from sklearn.metrics import accuracy_score
+from sklearn.linear_model import Perceptron
 
 
 def make_y(c):
-    def y(x_index, data):
-        return 1 if data.target[x_index] == c else -1
-    return y
+    def y_func(y):
+        return 1 if y == c else 0
+    return y_func
 
 
 class OvA:
     def __init__(self):
         self.W = None
 
-    def fit(self, data, times=1000, learning_rate=10**-3):
+    def fit(self, X, Y, labels_num, times=1000, learning_rate=10**-2):
         self.W = None
-
-        for c in data.target_names:
-            y = make_y(c)
-            w_c = WHALG(data, y, times, learning_rate)
-            if self.W is None:
-                self.W = np.array(w_c).reshape(-1, 1)
-            else:
-                self.W = np.append(self.W, w_c, axis=1)
+        weights = []
+        for c in range(labels_num):
+            y_func = make_y(c)
+            w_c = WHALG(X, Y, y_func, times, learning_rate)
+            weights.append(w_c)
+        self.W = np.column_stack(weights)
 
     def predict(self, X):
         Y = X@self.W
         res = []
         for row in Y:
-            r = max(row, key=lambda x: x-1 if x >= 0 else x+1)
-            res.append(1 if r > 0 else -1)
+            best_index = np.argmax(row)
+            res.append(best_index)
         return res
 
 
-def WHALG(dataset, y_func, times, learning_rate):
-    N = dataset.data.shape[0]
-    M = dataset.data.shape[1]
+def WHALG(X, Y, y_func, times, learning_rate):
+    N = X.shape[0]
+    M = X.shape[1]
     w = np.zeros(M)
 
-    for t in range(times):
-        ind = np.random.randint(0, N)
-        x = dataset.data[ind]
-        y_hat = x.transpose()@w
-        y = y_func(ind, dataset)
+    # for t in range(times):
+    #     index = np.random.randint(0, N)
+    #     x, y = X[index], y_func(Y[index])
+    #     y_hat = x.transpose()@w
+    #     w += learning_rate*(y - y_hat)*x
+
+    for x, y in zip(X, Y):
+        y = y_func(y)
+        y_hat = np.dot(x, w)
         w += learning_rate*(y - y_hat)*x
+
+    Y_c = [y_func(y) for y in Y]
+    w2,_,_,_ = np.linalg.lstsq(X, Y_c)
 
     return w
 
 
 if __name__ == '__main__':
-    digits = load_digits()
+    dataset = load_iris()
+    X = dataset.data
+    Y = dataset.target
+    N = len(dataset.target_names)
     classifier = OvA()
-    classifier.fit(digits)
+    perceptron = Perceptron()
+    classifier.fit(X, Y, N)
+    perceptron.fit(X, Y)
+    X_cut = X[:2000]
+    Y_hat = classifier.predict(X)
+    accuracy = accuracy_score(Y[:2000], Y_hat)
+    score = perceptron.score(X, Y)
 
+
+#digits learning rate 10**-5
