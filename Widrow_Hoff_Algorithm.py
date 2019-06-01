@@ -40,7 +40,7 @@ class OvA:
         labels_num = len(np.unique(Y))
         for c in range(labels_num):
             y_func = make_y(c)
-            w_c, _ = WHALG(X, Y, y_func, times, learning_rate)
+            w_c, _ = WHALG(X, Y, y_func, times, learning_rate, error=None)
             weights.append(w_c)
         self.W = np.column_stack(weights)
 
@@ -149,7 +149,10 @@ def compare_convergence_times():
 if __name__ == '__main__':
     compare_classification()
     LMS_time1, P_time1, LMS_time2, P_time2 = compare_convergence_times()
-
+    print("LMS_time1: " + str(LMS_time1))
+    print("P_time1: " + str(P_time1))
+    print("LMS_time2: " + str(LMS_time2))
+    print("P_time2: " + str(P_time2))
 
 
 
