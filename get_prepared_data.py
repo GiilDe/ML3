@@ -2,6 +2,7 @@ from data_handling import to_numerical_data, split_data, scale_all, X_Y_2_XY, XY
 from imputations import impute_train_X, impute_test_and_validation
 from outliers_detection import clean_and_correct_train_X
 from FeatureSelection import *
+import pandas as pd
 
 
 def get_data():
